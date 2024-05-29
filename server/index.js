@@ -2,49 +2,42 @@ require("dotenv").config();
 
 const mysql = require("mysql2/promise");
 
-const createDB = async () => {
-  try {
-    // Create a specific connection to the database
+// Get variables from .env file for database connection
 
-    const databaseClient = await mysql.createConnection({
-      host: "localhost",
-      port: "3306",
-      user: process.env.DB_USER,
-      password: process.env.DB_PASSWORD,
+const { DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME } = process.env;
+
+const createData = async () => {
+  try {
+    // Create a connection pool to the database
+
+    const databaseClient = mysql.createPool({
+      host: DB_HOST,
+
+      port: DB_PORT,
+
+      user: DB_USER,
+
+      password: DB_PASSWORD,
+
+      database: DB_NAME,
     });
 
-    // Drop the existing database if it exists
+    // Create data
 
-    await databaseClient.query("DROP DATABASE IF EXISTS wildseries");
+    const results = await databaseClient.query(
+      "INSERT INTO category (name) VALUES ('Science-Fiction')"
+    );
 
-    // Create a new database with the specified name
-
-    await databaseClient.query("CREATE DATABASE wildseries");
-
-    // Switch to the newly created database
-
-    await databaseClient.query("USE wildseries");
-
-    // Execute the SQL statements to update the database schema
-
-    await databaseClient.query(`CREATE TABLE program(
-
-      id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-
-      title VARCHAR(100) NOT NULL
-
-    )`);
-
-    // Close the database connection
+    // Close the connection pool
 
     databaseClient.end();
 
-    console.info("wildseries updated 🆙");
+    console.info(results);
   } catch (err) {
-    console.error("Error updating the database:", err.message, err.stack);
+    console.error("Error editing the database:", err.message, err.stack);
   }
 };
 
-// Run the createDB function
+// Run the createData function
 
-createDB();
+createData();

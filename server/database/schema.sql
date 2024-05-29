@@ -12,8 +12,8 @@ create table item (
 );
 
 create table category (
-  id int unsigned primary key auto_increment not null,
-  name varchar(255) not null
+  id int unsigned not null primary key auto_increment,
+  name varchar(255) not null UNIQUE_KEY
 );
 
 create table program (
